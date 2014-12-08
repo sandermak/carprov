@@ -1,6 +1,9 @@
 package carprov.navigation;
 
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.Inject;
@@ -18,6 +21,14 @@ public class NavigationApp implements App {
 	@Override
 	public Node getDashboardIcon() {
 		return DashboardHelper.getIcon(bundleContext, "maps");
+	}
+
+	@Override
+	public Node getMainApp() {
+		Text text = new Text("NAVIGATION!!");
+		text.setFill(Color.AQUAMARINE);
+		text.setFont(new Font(20));
+		return text;
 	}
 
 }

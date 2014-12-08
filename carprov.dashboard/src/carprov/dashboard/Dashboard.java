@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -28,7 +29,8 @@ public class Dashboard {
 	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
 	private Stage stage;
 	private FlowPane pane;
-	
+	private BorderPane root;
+
 	@Start
 	public void start() {
 		// Workaround to trigger toolkit init because
@@ -44,11 +46,11 @@ public class Dashboard {
 		Platform.runLater(() -> destroyUI());
 		System.out.println("Dashboard stopped");
 	}
-	
+
 	@ServiceDependency(removed = "removeApp")
 	public void addApp(ServiceReference sr, App app) {
 		System.out.println("added " + sr);
-		Platform.runLater(() ->renderApp(app));
+		renderApp(app);
 		apps.put(sr, app);
 	}
 
@@ -57,16 +59,21 @@ public class Dashboard {
 	}
 
 	private void renderApp(App app) {
-		if(pane != null) {
-			pane.getChildren().add(app.getDashboardIcon());
+		if (pane != null) {
+			Platform.runLater(() -> {
+				Node dashboardApp = app.getDashboardIcon();
+				dashboardApp.setOnMouseClicked(event -> root.setCenter(app
+						.getMainApp()));
+				pane.getChildren().add(dashboardApp);
+			});
 		}
 	}
-	
+
 	private void createUI() {
 		if (stage == null) {
 			stage = new Stage();
 		}
-	    BorderPane root = new BorderPane();
+		root = new BorderPane();
 		Scene scene = new Scene(root, 600, 400);
 		root.setStyle("-fx-background-color: #444444;");
 		Text text = new Text("My first dashboard");
@@ -81,12 +88,14 @@ public class Dashboard {
 		stage.setScene(scene);
 		stage.show();
 	}
-	
+
 	private void destroyUI() {
-		stage = null;
-		pane = null;
+		Platform.runLater(() -> {
+			stage.hide();
+			stage = null;
+			pane = null;
+			root = null;
+		});
 	}
-	
-	
 
 }

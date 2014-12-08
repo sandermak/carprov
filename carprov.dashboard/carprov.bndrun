@@ -20,9 +20,11 @@
 -runsystempackages: \
    javafx.application,\
    javafx.collections,\
+   javafx.event,\
    javafx.geometry,\
    javafx.scene,\
    javafx.scene.image,\
+   javafx.scene.input,\
    javafx.scene.control,\
    javafx.scene.layout,\
    javafx.scene.paint,\

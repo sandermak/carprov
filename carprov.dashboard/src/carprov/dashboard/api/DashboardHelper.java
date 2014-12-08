@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import org.osgi.framework.BundleContext;
 
 public class DashboardHelper {
+	
 	public static Node getIcon(BundleContext bundleContext, String name) {
 		URL entry = bundleContext.getBundle().getEntry(name + ".png");
 		try {
@@ -21,4 +22,5 @@ public class DashboardHelper {
 			throw new RuntimeException(e);
 		}
 	}
+	
 }
