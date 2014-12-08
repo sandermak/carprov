@@ -58,7 +58,10 @@ public class Dashboard {
 	public void removeApp(ServiceReference sr) {
 		System.out.println("removed " + sr);
 		App removedApp = apps.remove(sr);
-		Platform.runLater(() -> addedDashboardIcons.remove(removedApp));
+		Platform.runLater(() -> {
+			Node removedDashboardApp = addedDashboardIcons.remove(removedApp);
+			pane.getChildren().remove(removedDashboardApp);
+		});
 	}
 
 	private void renderApp(App app) {
