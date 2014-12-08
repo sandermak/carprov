@@ -1,0 +1,9 @@
+Bundle-Version: 1.0.0
+-includeresource: static
+-buildpath:  \
+	../cnf/plugins/org.apache.felix.dependencymanager.annotation-3.2.0.jar;version=file,\
+	org.apache.felix.dependencymanager,\
+	osgi.core,\
+	carprov.dashboard.api;version=latest
+Private-Package:  \
+	carprov.navigation

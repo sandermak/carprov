@@ -2,7 +2,9 @@
 -runee: JavaSE-1.8
 
 -runbundles: \
-   carprov.dashboard;version=latest,\
+   carprov.dashboard.impl;version=latest,\
+   carprov.dashboard.api;version=latest,\
+   carprov.navigation;version=latest,\
    org.apache.felix.dependencymanager,\
    org.apache.felix.dependencymanager.runtime,\
    org.apache.felix.dependencymanager.shell,\

@@ -1,16 +1,13 @@
 package carprov.dashboard;
 
-import java.io.IOException;
-import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
@@ -18,18 +15,19 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import org.apache.felix.dm.annotation.api.Component;
-import org.apache.felix.dm.annotation.api.Inject;
+import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
-import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
+import carprov.dashboard.api.App;
 
 @Component
 public class Dashboard {
 
+	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
 	private Stage stage;
-	
-	@Inject
-	private volatile BundleContext bundleContext;
+	private FlowPane pane;
 	
 	@Start
 	public void start() {
@@ -46,49 +44,49 @@ public class Dashboard {
 		Platform.runLater(() -> destroyUI());
 		System.out.println("Dashboard stopped");
 	}
+	
+	@ServiceDependency(removed = "removeApp")
+	public void addApp(ServiceReference sr, App app) {
+		System.out.println("added " + sr);
+		Platform.runLater(() ->renderApp(app));
+		apps.put(sr, app);
+	}
 
+	public void removeApp(ServiceReference sr) {
+		// todo
+	}
+
+	private void renderApp(App app) {
+		if(pane != null) {
+			pane.getChildren().add(app.getDashboardIcon());
+		}
+	}
+	
 	private void createUI() {
 		if (stage == null) {
 			stage = new Stage();
 		}
-		BorderPane root = new BorderPane();
+	    BorderPane root = new BorderPane();
 		Scene scene = new Scene(root, 600, 400);
 		root.setStyle("-fx-background-color: #444444;");
 		Text text = new Text("My first dashboard");
 		text.setFill(Color.AZURE);
 		root.setTop(text);
-		root.setCenter(getDashboard());
+		pane = new FlowPane();
+		pane.setPadding(new Insets(20));
+		apps.values().forEach(this::renderApp);
+		pane.setOrientation(Orientation.HORIZONTAL);
+		root.setCenter(pane);
 		root.setPadding(new Insets(20));
 		stage.setScene(scene);
 		stage.show();
 	}
 	
 	private void destroyUI() {
-		
+		stage = null;
+		pane = null;
 	}
 	
-	private Node getDashboard() {
-		FlowPane pane = new FlowPane();
-		pane.setOrientation(Orientation.HORIZONTAL);
-		pane.getChildren().add(getIcon("radio"));
-		pane.getChildren().add(getIcon("maps"));
-		pane.getChildren().add(getIcon("games"));
-		pane.getChildren().add(getIcon("phone"));
-		pane.getChildren().add(getIcon("music"));
-		pane.getChildren().add(getIcon("config"));
-		pane.setPadding(new Insets(20));
-		return pane;
-	}
+	
 
-	private Node getIcon(String name) {
-		URL entry = bundleContext.getBundle().getEntry(name + ".png");
-		try {
-			Image image = new Image(entry.openStream());
-			ImageView view = new ImageView(image);
-			view.setPreserveRatio(true);
-			return view;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }
