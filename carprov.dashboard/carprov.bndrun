@@ -1,0 +1,29 @@
+-runfw: org.apache.felix.framework;version='[4,5)'
+-runee: JavaSE-1.8
+
+-runbundles: \
+   carprov.dashboard;version=latest,\
+   org.apache.felix.dependencymanager,\
+   org.apache.felix.dependencymanager.runtime,\
+   org.apache.felix.dependencymanager.shell,\
+   org.apache.felix.metatype,\
+   org.apache.felix.eventadmin,\
+   org.apache.felix.configadmin,\
+   org.apache.felix.log,\
+   org.apache.felix.gogo.command;version='[0.12.0, 0.12.0]',\
+   org.apache.felix.gogo.runtime;version='[0.10.0, 0.10.0]',\
+   org.apache.felix.gogo.shell;version='[0.10.0, 0.10.0]'
+   
+
+-runsystempackages: \
+   javafx.application,\
+   javafx.collections,\
+   javafx.geometry,\
+   javafx.scene,\
+   javafx.scene.image,\
+   javafx.scene.control,\
+   javafx.scene.layout,\
+   javafx.scene.paint,\
+   javafx.scene.text,\
+   javafx.stage,\
+   javafx.embed.swing
