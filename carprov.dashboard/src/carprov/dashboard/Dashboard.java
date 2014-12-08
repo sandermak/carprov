@@ -27,6 +27,7 @@ import carprov.dashboard.api.App;
 public class Dashboard {
 
 	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
+	private final Map<App, Node> addedDashboardIcons = new ConcurrentHashMap<>();
 	private Stage stage;
 	private FlowPane pane;
 	private BorderPane root;
@@ -47,7 +48,7 @@ public class Dashboard {
 		System.out.println("Dashboard stopped");
 	}
 
-	@ServiceDependency(removed = "removeApp")
+	@ServiceDependency(removed = "removeApp", required = false)
 	public void addApp(ServiceReference sr, App app) {
 		System.out.println("added " + sr);
 		renderApp(app);
@@ -55,13 +56,16 @@ public class Dashboard {
 	}
 
 	public void removeApp(ServiceReference sr) {
-		// todo
+		System.out.println("removed " + sr);
+		App removedApp = apps.remove(sr);
+		Platform.runLater(() -> addedDashboardIcons.remove(removedApp));
 	}
 
 	private void renderApp(App app) {
 		if (pane != null) {
 			Platform.runLater(() -> {
 				Node dashboardApp = app.getDashboardIcon();
+				addedDashboardIcons.put(app, dashboardApp);
 				dashboardApp.setOnMouseClicked(event -> root.setCenter(app
 						.getMainApp()));
 				pane.getChildren().add(dashboardApp);
