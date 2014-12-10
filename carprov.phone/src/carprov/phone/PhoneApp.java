@@ -1,4 +1,4 @@
-package carprov.navigation;
+package carprov.phone;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -13,14 +13,14 @@ import carprov.dashboard.api.App;
 import carprov.dashboard.api.DashboardHelper;
 
 @Component
-public class NavigationApp implements App {
+public class PhoneApp implements App {
 	
 	@Inject
 	private volatile BundleContext bundleContext;
 	
 	@Override
 	public Node getDashboardIcon() {
-		return DashboardHelper.getImage(bundleContext, "maps");
+		return DashboardHelper.getImage(bundleContext, "phone");
 	}
 
 	@Override

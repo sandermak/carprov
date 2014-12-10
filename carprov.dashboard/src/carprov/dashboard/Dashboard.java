@@ -9,23 +9,33 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.Inject;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import carprov.dashboard.api.App;
+import carprov.dashboard.api.DashboardHelper;
 
 @Component
 public class Dashboard {
 
+	@Inject
+	private volatile BundleContext bundleContext;
+	
 	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
 	private final Map<App, Node> addedDashboardIcons = new ConcurrentHashMap<>();
 	private Stage stage;
@@ -83,17 +93,34 @@ public class Dashboard {
 		root = new BorderPane();
 		Scene scene = new Scene(root, 600, 400);
 		root.setStyle("-fx-background-color: #444444;");
-		Text text = new Text("My first dashboard");
-		text.setFill(Color.AZURE);
-		root.setTop(text);
+		root.setTop(getTopBar());
 		pane = new FlowPane();
 		pane.setPadding(new Insets(20));
-		apps.values().forEach(this::renderApp);
 		pane.setOrientation(Orientation.HORIZONTAL);
+		apps.values().forEach(this::renderApp);
 		root.setCenter(pane);
 		root.setPadding(new Insets(20));
 		stage.setScene(scene);
 		stage.show();
+	}
+
+	private Node getTopBar() {
+		ImageView homeImg = DashboardHelper.getImage(bundleContext, "home");
+		homeImg.setFitHeight(40);
+		homeImg.setOnMouseClicked(event -> {
+			root.setCenter(pane);
+		});
+		
+		Text text = new Text("Ace Car Entertainment");
+		text.setFont(new Font("Open Sans", 22));
+		text.setFill(Color.AZURE);
+
+		BorderPane pane = new BorderPane();
+		pane.setPadding(new Insets(10));
+		pane.setStyle("-fx-background-color: #222222;");
+		pane.setLeft(text);
+		pane.setRight(homeImg);
+		return pane;
 	}
 
 	private void destroyUI() {
