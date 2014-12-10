@@ -19,13 +19,18 @@ public class PhoneApp implements App {
 	private volatile BundleContext bundleContext;
 	
 	@Override
+	public String getAppName() {
+		return "Phone";
+	}
+	
+	@Override
 	public Node getDashboardIcon() {
 		return DashboardHelper.getImage(bundleContext, "phone");
 	}
 
 	@Override
 	public Node getMainApp() {
-		Text text = new Text("NAVIGATION!!");
+		Text text = new Text("PHONE!!");
 		text.setFill(Color.AQUAMARINE);
 		text.setFont(new Font(20));
 		return text;

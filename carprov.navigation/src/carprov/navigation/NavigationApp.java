@@ -19,6 +19,11 @@ public class NavigationApp implements App {
 	private volatile BundleContext bundleContext;
 	
 	@Override
+	public String getAppName() {
+		return "Navigation";
+	}
+	
+	@Override
 	public Node getDashboardIcon() {
 		return DashboardHelper.getImage(bundleContext, "maps");
 	}

@@ -10,9 +10,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -33,11 +31,15 @@ import carprov.dashboard.api.DashboardHelper;
 @Component
 public class Dashboard {
 
+	private static final String DASHBOARD_TITLE = "Ace Car Entertainment";
+	
 	@Inject
 	private volatile BundleContext bundleContext;
 	
 	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
 	private final Map<App, Node> addedDashboardIcons = new ConcurrentHashMap<>();
+	
+	private Text titleText;
 	private Stage stage;
 	private FlowPane pane;
 	private BorderPane root;
@@ -79,27 +81,37 @@ public class Dashboard {
 			Platform.runLater(() -> {
 				Node dashboardApp = app.getDashboardIcon();
 				addedDashboardIcons.put(app, dashboardApp);
-				dashboardApp.setOnMouseClicked(event -> root.setCenter(app
-						.getMainApp()));
+				dashboardApp.setOnMouseClicked(event -> startApp(app));
 				pane.getChildren().add(dashboardApp);
 			});
 		}
 	}
 
+	private void startApp(App app) {
+		titleText.setText(DASHBOARD_TITLE + " > " + app.getAppName()); 
+		root.setCenter(app.getMainApp());
+	}
+	
+	private void startDashboard() {
+		titleText.setText(DASHBOARD_TITLE);
+		root.setCenter(pane);
+	}
 	private void createUI() {
 		if (stage == null) {
 			stage = new Stage();
 		}
 		root = new BorderPane();
+		root.setPadding(new Insets(20));
 		Scene scene = new Scene(root, 600, 400);
 		root.setStyle("-fx-background-color: #444444;");
 		root.setTop(getTopBar());
+
 		pane = new FlowPane();
 		pane.setPadding(new Insets(20));
 		pane.setOrientation(Orientation.HORIZONTAL);
 		apps.values().forEach(this::renderApp);
-		root.setCenter(pane);
-		root.setPadding(new Insets(20));
+		startDashboard();
+		
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -107,18 +119,16 @@ public class Dashboard {
 	private Node getTopBar() {
 		ImageView homeImg = DashboardHelper.getImage(bundleContext, "home");
 		homeImg.setFitHeight(40);
-		homeImg.setOnMouseClicked(event -> {
-			root.setCenter(pane);
-		});
+		homeImg.setOnMouseClicked(event -> startDashboard());
 		
-		Text text = new Text("Ace Car Entertainment");
-		text.setFont(new Font("Open Sans", 22));
-		text.setFill(Color.AZURE);
+		titleText = new Text(DASHBOARD_TITLE);
+		titleText.setFont(new Font("Open Sans", 22));
+		titleText.setFill(Color.AZURE);
 
 		BorderPane pane = new BorderPane();
 		pane.setPadding(new Insets(10));
 		pane.setStyle("-fx-background-color: #222222;");
-		pane.setLeft(text);
+		pane.setLeft(titleText);
 		pane.setRight(homeImg);
 		return pane;
 	}
