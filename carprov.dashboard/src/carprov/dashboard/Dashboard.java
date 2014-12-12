@@ -41,11 +41,11 @@ public class Dashboard {
 	
 	private Text titleText;
 	private Stage stage;
-	private FlowPane pane;
-	private BorderPane root;
+	private BorderPane mainView;
+	private FlowPane dashboardIcons;
 
 	@Start
-	public void start() {
+	void start() {
 		// Workaround to trigger toolkit init because
 		// we are not using JavaFX's Application class
 		System.out.println(new JFXPanel());
@@ -55,60 +55,62 @@ public class Dashboard {
 	}
 
 	@Stop
-	public void stop() {
+	void stop() {
 		Platform.runLater(() -> destroyUI());
 		System.out.println("Dashboard stopped");
 	}
 
 	@ServiceDependency(removed = "removeApp", required = false)
-	public void addApp(ServiceReference sr, App app) {
+	void addApp(ServiceReference sr, App app) {
 		System.out.println("added " + sr);
 		renderApp(app);
 		apps.put(sr, app);
 	}
 
-	public void removeApp(ServiceReference sr) {
+	void removeApp(ServiceReference sr) {
 		System.out.println("removed " + sr);
 		App removedApp = apps.remove(sr);
 		Platform.runLater(() -> {
 			Node removedDashboardApp = addedDashboardIcons.remove(removedApp);
-			pane.getChildren().remove(removedDashboardApp);
+			dashboardIcons.getChildren().remove(removedDashboardApp);
 		});
 	}
 
 	private void renderApp(App app) {
-		if (pane != null) {
+		if (dashboardIcons != null) {
 			Platform.runLater(() -> {
 				Node dashboardApp = app.getDashboardIcon();
 				addedDashboardIcons.put(app, dashboardApp);
 				dashboardApp.setOnMouseClicked(event -> startApp(app));
-				pane.getChildren().add(dashboardApp);
+				dashboardIcons.getChildren().add(dashboardApp);
 			});
 		}
 	}
 
 	private void startApp(App app) {
 		titleText.setText(DASHBOARD_TITLE + " > " + app.getAppName()); 
-		root.setCenter(app.getMainApp());
+		Node mainApp = app.getMainApp();
+		mainView.setCenter(mainApp);
 	}
 	
 	private void startDashboard() {
 		titleText.setText(DASHBOARD_TITLE);
-		root.setCenter(pane);
+		mainView.setCenter(dashboardIcons);
 	}
+	
 	private void createUI() {
 		if (stage == null) {
 			stage = new Stage();
 		}
-		root = new BorderPane();
-		root.setPadding(new Insets(20));
-		Scene scene = new Scene(root, 600, 400);
-		root.setStyle("-fx-background-color: #444444;");
-		root.setTop(getTopBar());
+		mainView = new BorderPane();
+		mainView.setPadding(new Insets(20));
+		Scene scene = new Scene(mainView, 600, 400);
+		mainView.setStyle("-fx-background-color: #444444;");
+		mainView.setTop(getTopBar());
 
-		pane = new FlowPane();
-		pane.setPadding(new Insets(20));
-		pane.setOrientation(Orientation.HORIZONTAL);
+		dashboardIcons = new FlowPane();
+		dashboardIcons.setPadding(new Insets(20));
+		dashboardIcons.setOrientation(Orientation.HORIZONTAL);
 		apps.values().forEach(this::renderApp);
 		startDashboard();
 		
@@ -137,8 +139,8 @@ public class Dashboard {
 		Platform.runLater(() -> {
 			stage.hide();
 			stage = null;
-			pane = null;
-			root = null;
+			dashboardIcons = null;
+			mainView = null;
 		});
 	}
 
