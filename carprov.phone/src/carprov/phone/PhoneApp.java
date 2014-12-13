@@ -37,6 +37,11 @@ public class PhoneApp implements App {
 	}
 	
 	@Override
+	public int getPreferredPosition() {
+		return 20;
+	}
+	
+	@Override
 	public Node getDashboardIcon() {
 		return DashboardHelper.getImage(bundleContext, "phone");
 	}

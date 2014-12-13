@@ -24,6 +24,11 @@ public class NavigationApp implements App {
 	}
 	
 	@Override
+	public int getPreferredPosition() {
+		return 10;
+	}
+	
+	@Override
 	public Node getDashboardIcon() {
 		return DashboardHelper.getImage(bundleContext, "maps");
 	}

@@ -1,5 +1,6 @@
 package carprov.dashboard;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,9 +81,22 @@ public class Dashboard {
 		if (dashboardIcons != null) {
 			Platform.runLater(() -> {
 				Node dashboardApp = app.getDashboardIcon();
+				dashboardApp.setUserData(app.getPreferredPosition());
 				addedDashboardIcons.put(app, dashboardApp);
 				dashboardApp.setOnMouseClicked(event -> startApp(app));
-				dashboardIcons.getChildren().add(dashboardApp);
+				
+				// Add to children while respecting the preferred order
+				List<Node> children = dashboardIcons.getChildren();
+				if(children.size() == 0) {
+					children.add(dashboardApp);
+				} else {
+					for(int index = 0; index < children.size(); index++) {
+						if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
+							children.add(index, dashboardApp);
+							break;
+						}
+					}		
+				}
 			});
 		}
 	}
