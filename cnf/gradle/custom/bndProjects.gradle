@@ -5,3 +5,5 @@
  */
 
 assert(project != rootProject)
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
