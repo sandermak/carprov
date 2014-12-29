@@ -86,18 +86,16 @@ public class Dashboard {
 				dashboardApp.setOnMouseClicked(event -> startApp(app));
 				
 				// Add to children while respecting the preferred order
-				synchronized(this) {
-					List<Node> children = dashboardIcons.getChildren();
-					if(children.size() == 0) {
-						children.add(dashboardApp);
-					} else {
-						for(int index = 0; index < children.size(); index++) {
-							if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
-								children.add(index, dashboardApp);
-								break;
-							}
-						}		
-					}
+				List<Node> children = dashboardIcons.getChildren();
+				if(children.size() == 0) {
+					children.add(dashboardApp);
+				} else {
+					for(int index = 0; index < children.size(); index++) {
+						if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
+							children.add(index, dashboardApp);
+							break;
+						}
+					}		
 				}
 			});
 		}
