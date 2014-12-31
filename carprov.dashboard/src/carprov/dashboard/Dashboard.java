@@ -3,6 +3,7 @@ package carprov.dashboard;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -38,7 +39,8 @@ public class Dashboard {
 	private volatile BundleContext bundleContext;
 	
 	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
-	private final Map<App, Node> addedDashboardIcons = new ConcurrentHashMap<>();
+	private final Map<String, Node> addedDashboardIcons = new ConcurrentHashMap<>();
+	private final AtomicBoolean uiReady = new AtomicBoolean(false);
 	
 	private Text titleText;
 	private Stage stage;
@@ -63,42 +65,53 @@ public class Dashboard {
 
 	@ServiceDependency(removed = "removeApp", required = false)
 	void addApp(ServiceReference sr, App app) {
-		System.out.println("added " + sr);
-		renderApp(app);
+		System.out.println("added " + app.getAppName());
+		if (uiReady.get()) {
+			System.out.println("Directly scheduling render for " + app.getAppName());
+			Platform.runLater(() -> renderApp(app));
+		}
 		apps.put(sr, app);
 	}
 
 	void removeApp(ServiceReference sr) {
 		System.out.println("removed " + sr);
 		App removedApp = apps.remove(sr);
-		Platform.runLater(() -> {
-			Node removedDashboardApp = addedDashboardIcons.remove(removedApp);
-			dashboardIcons.getChildren().remove(removedDashboardApp);
-		});
-	}
-
-	private void renderApp(App app) {
-		if (dashboardIcons != null) {
+		Node removedDashboardApp = addedDashboardIcons.remove(removedApp.getAppName());
+		if(uiReady.get()) {
 			Platform.runLater(() -> {
-				Node dashboardApp = app.getDashboardIcon();
-				dashboardApp.setUserData(app.getPreferredPosition());
-				addedDashboardIcons.put(app, dashboardApp);
-				dashboardApp.setOnMouseClicked(event -> startApp(app));
-				
-				// Add to children while respecting the preferred order
-				List<Node> children = dashboardIcons.getChildren();
-				if(children.size() == 0) {
-					children.add(dashboardApp);
-				} else {
-					for(int index = 0; index < children.size(); index++) {
-						if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
-							children.add(index, dashboardApp);
-							break;
-						}
-					}		
+				synchronized(dashboardIcons) {
+					dashboardIcons.getChildren().remove(removedDashboardApp);
 				}
 			});
 		}
+	}
+
+	private void renderApp(App app) {
+			Node dashboardApp = app.getDashboardIcon();
+			dashboardApp.setUserData(app.getPreferredPosition());
+			addedDashboardIcons.put(app.getAppName(), dashboardApp);
+			dashboardApp.setOnMouseClicked(event -> startApp(app));
+			
+			// Add to children while respecting the preferred order
+			synchronized(dashboardIcons) {
+				List<Node> children = dashboardIcons.getChildren();
+				if(children.size() == 0) {
+					System.out.println("Rendered " + app.getAppName() + " icon as first app");
+					children.add(dashboardApp);
+				} else {
+					System.out.println("Try render " + app.getAppName() + " as non-first app");
+					for(int index = 0; index < children.size(); index++) {
+						if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
+							System.out.println("Rendered " + app.getAppName() + " icon at position " + index);
+							children.add(index, dashboardApp);
+							break;
+						}
+						if(index == children.size() - 1) {
+							children.add(index, dashboardApp);
+						}
+					}		
+				}
+			}
 	}
 
 	private void startApp(App app) {
@@ -125,11 +138,14 @@ public class Dashboard {
 		dashboardIcons = new FlowPane();
 		dashboardIcons.setPadding(new Insets(20));
 		dashboardIcons.setOrientation(Orientation.HORIZONTAL);
-		apps.values().forEach(this::renderApp);
 		startDashboard();
 		
 		stage.setScene(scene);
+		System.out.println("Rendering " + apps.size() + " apps"); 
+		apps.values().forEach(this::renderApp);
 		stage.show();
+		uiReady.set(true);
+		System.out.println("UI shown");
 	}
 
 	private Node getTopBar() {
@@ -155,6 +171,8 @@ public class Dashboard {
 			stage = null;
 			dashboardIcons = null;
 			mainView = null;
+			uiReady.set(false);
+			System.out.println("UI destroyed");
 		});
 	}
 
