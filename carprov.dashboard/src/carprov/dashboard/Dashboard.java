@@ -32,7 +32,14 @@ import carprov.dashboard.api.DashboardHelper;
 
 @Component
 public class Dashboard {
-
+	
+	static {
+	    // Workaround to trigger toolkit init because
+	    // we are not using JavaFX's Application class
+	    new JFXPanel();
+	    Platform.setImplicitExit(false);
+	}
+	
 	private static final String DASHBOARD_TITLE = "Ace Car Entertainment";
 	
 	@Inject
@@ -49,10 +56,6 @@ public class Dashboard {
 
 	@Start
 	void start() {
-		// Workaround to trigger toolkit init because
-		// we are not using JavaFX's Application class
-		System.out.println(new JFXPanel());
-		Platform.setImplicitExit(false);
 		System.out.println("Dashboard started");
 		Platform.runLater(() -> createUI());
 	}
@@ -97,17 +100,19 @@ public class Dashboard {
 				List<Node> children = dashboardIcons.getChildren();
 				if(children.size() == 0) {
 					System.out.println("Rendered " + app.getAppName() + " icon as first app");
-					children.add(dashboardApp);
+					children.add(dashboardApp); 
 				} else {
 					System.out.println("Try render " + app.getAppName() + " as non-first app");
 					for(int index = 0; index < children.size(); index++) {
 						if((int) children.get(index).getUserData() >= app.getPreferredPosition()) {
-							System.out.println("Rendered " + app.getAppName() + " icon at position " + index);
+							System.out.println("Rendered " + app.getAppName() + " icon at position " + index + " (size: " + children.size() + ")");
 							children.add(index, dashboardApp);
 							break;
 						}
 						if(index == children.size() - 1) {
-							children.add(index, dashboardApp);
+							System.out.println("Rendered " + app.getAppName() + " icon at end (size: " + children.size() + ")");
+							children.add(dashboardApp);
+							break;
 						}
 					}		
 				}
@@ -167,11 +172,11 @@ public class Dashboard {
 
 	private void destroyUI() {
 		Platform.runLater(() -> {
-			stage.hide();
-			stage = null;
-			dashboardIcons = null;
-			mainView = null;
 			uiReady.set(false);
+			stage.hide();
+			titleText = null;
+			mainView = null;
+			dashboardIcons = null;
 			System.out.println("UI destroyed");
 		});
 	}
