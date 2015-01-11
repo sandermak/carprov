@@ -20,6 +20,7 @@
 
 -runsystempackages: \
    javafx.application,\
+   javafx.beans.property,\
    javafx.collections,\
    javafx.event,\
    javafx.geometry,\
