@@ -47,7 +47,6 @@ public class NavigationApp implements App {
 
 	@Override
 	public Node getMainApp() {
-	    
 	    Text text = new Text("Destination: ");
 	    text.setFont(new Font("Open Sans", 18));
         text.setFill(Color.AZURE);

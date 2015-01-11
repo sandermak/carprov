@@ -10,8 +10,8 @@ import org.osgi.framework.BundleContext;
 
 public class DashboardHelper {
 	
-	public static ImageView getImage(BundleContext bundleContext, String name) {
-		URL entry = bundleContext.getBundle().getEntry(name + ".png");
+	public static ImageView getImageByFullname(BundleContext bundleContext, String name) {
+		URL entry = bundleContext.getBundle().getEntry(name);
 		try {
 			Image image = new Image(entry.openStream());
 			ImageView view = new ImageView(image);
@@ -22,4 +22,7 @@ public class DashboardHelper {
 		}
 	}
 	
+	public static ImageView getImage(BundleContext bundleContext, String name) {
+	    return getImageByFullname(bundleContext, name + ".png");
+	}
 }

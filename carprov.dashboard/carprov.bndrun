@@ -4,6 +4,7 @@
 -runbundles: \
    carprov.dashboard.impl;version=latest,\
    carprov.dashboard.api;version=latest,\
+   carprov.music;version=latest,\
    carprov.navigation;version=latest,\
    carprov.phone;version=latest,\
    org.apache.felix.dependencymanager,\
@@ -25,6 +26,7 @@
    javafx.event,\
    javafx.geometry,\
    javafx.scene,\
+   javafx.scene.effect,\
    javafx.scene.image,\
    javafx.scene.input,\
    javafx.scene.control,\
