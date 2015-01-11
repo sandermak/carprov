@@ -141,6 +141,8 @@ public class Dashboard {
 		mainView.setTop(getTopBar());
 
 		dashboardIcons = new FlowPane();
+		dashboardIcons.setVgap(25);
+		dashboardIcons.setHgap(25);
 		dashboardIcons.setPadding(new Insets(20));
 		dashboardIcons.setOrientation(Orientation.HORIZONTAL);
 		startDashboard();
