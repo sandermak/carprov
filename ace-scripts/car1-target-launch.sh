@@ -1,0 +1,6 @@
+java \
+-Dagent.identification.agentid=car1 \
+-Dagent.discovery.serverurls=http://10.0.1.200:8080 \
+-Dagent.controller.syncinterval=2 \
+-Dagent.controller.syncdelay=3 \
+-jar ace-launcher.jar -v -c car1.conf
