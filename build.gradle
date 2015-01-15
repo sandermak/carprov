@@ -1,45 +1,46 @@
 /*
- * WARNING
+ * Master Gradle build script
  *
- * This file is maintained automatically by Bndtools.
- * You should not edit it.
- *
- * See the BUILDING-GRADLE.md document in the root project for more details.
+ * Depends on bndPlugin property set by settings.gradle.
+ * and bnd_* values from gradle.properties.
  */
 
-assert(project == rootProject)
+import aQute.bnd.build.Workspace
 
-
-/* Scan for the location of the configuration (cnf) project, relative to the root project */
-def cnfs = new LinkedList<String>();
-rootDir.eachFile {
-  if (it.isDirectory() && new File(it, "build.bnd").exists()) {
-    cnfs.add(relativePath(it))
+/* Add bnd gradle plugin as a script dependency */
+buildscript {
+  dependencies {
+    classpath bndPlugin
   }
 }
-if (cnfs.isEmpty()) {
-  throw new GradleException("Could not locate the cnf project.")
+
+/* Initialize the bnd workspace */
+ext.bndWorkspace = Workspace.getWorkspace(rootDir, bnd_cnf)
+if (bndWorkspace == null) {
+  throw new GradleException("Unable to load workspace ${rootDir}/${bnd_cnf}")
 }
-if (cnfs.size() > 1) {
-  throw new GradleException("Multiple cnf projects found: $cnfs")
+
+ext.cnf = rootProject.project(bnd_cnf)
+
+/* Configure the subprojects */
+subprojects {
+  def bndProject = bndWorkspace.getProject(name)
+  if (bndProject != null) {
+    plugins.apply 'biz.aQute.bnd'
+  }
 }
-ext.bnd_cnf = cnfs.get(0)
 
+task copyConf(type : Copy) {
+	from "run/conf"
+	into "release/conf"	
+}
 
-/* Load the workspace build settings */
-apply from: file("$bnd_cnf/gradle/template/settings-workspace.gradle")
+task copyRunnables(type : Copy) {
+	from "run/generated/distributions/executable"
+  exclude "shared.jar"
+  exclude "backend"
+	into "release"
+}
 
-/* Logging */
-assert(hasProperty("gradleBuild_loggingCaptureStandardOutput"))
-assert(hasProperty("gradleBuild_loggingLevel"))
-logging.captureStandardOutput   gradleBuild_loggingCaptureStandardOutput
-logging.level                 = gradleBuild_loggingLevel
-
-/* Determine the build dependencies */
-apply from: file("$bnd_cnf/gradle/template/buildDependencies.gradle")
-
-/* Initialise the bnd workspace and load the workspace defaults */
-apply from: file("$bnd_cnf/gradle/template/bndWorkspace.gradle")
-
-/* Apply the build template */
-apply from: file("$bnd_cnf/gradle/template/template.gradle")
+task run(dependsOn: ['copyConf', 'copyRunnables']) {
+}
