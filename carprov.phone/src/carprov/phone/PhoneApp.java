@@ -55,13 +55,17 @@ public class PhoneApp implements App {
 		BorderPane pane = new BorderPane();
 		pane.setPadding(new Insets(20));
 		ImageView numberPadImg = DashboardHelper.getImage(bundleContext, "number-pad");
-		numberPadImg.setFitHeight(100);
+		numberPadImg.setFitHeight(200);
 		BorderPane.setAlignment(numberPadImg, Pos.CENTER);
 		pane.setLeft(numberPadImg);
 		TextField phone = new TextField();
 		phone.setFont(new Font(20));
 		phone.setMaxWidth(200);
 		pane.setCenter(phone);
+		ImageView callButtonImg = DashboardHelper.getImage(bundleContext, "call");
+		callButtonImg.setFitHeight(60);
+		BorderPane.setAlignment(callButtonImg, Pos.CENTER);
+        pane.setRight(callButtonImg);
 		return pane;
 	}
 
