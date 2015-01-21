@@ -1,6 +1,6 @@
 rm -rf ./felix-cache
 java \
--Dagent.identification.agentid=car1 \
+-Dagent.identification.agentid=car2 \
 -Dagent.discovery.serverurls=http://10.0.1.200:8080 \
 -Dagent.controller.syncinterval=2 \
 -Dagent.controller.syncdelay=3 \
