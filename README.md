@@ -1,6 +1,6 @@
 ### Example code for 'Provisioning the IoT'
 
-This repo contains a sample application that is used for the presentation 'Provisioning the IoT' by Paul Bakker and Sander Mak. Slides for this talk can be found [here](tbd).
+This repo contains a sample application that is used for the presentation 'Provisioning the IoT' by Paul Bakker and Sander Mak. Slides for this talk can be found [here](https://github.com/sandermak/carprov/blob/master/ace-demo/ProvisioningTheIoT.pdf?raw=true).
 
 The application itself is a small dashboard with apps that could run as an in-car entertainment system:
 
