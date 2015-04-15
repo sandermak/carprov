@@ -53,7 +53,7 @@ public class NavigationApp implements App {
         VBox box = new VBox(text);
         box.setPadding(new Insets(2));
         box.setBackground(new Background(new BackgroundFill(Color.web("#444444"), new CornerRadii(3), Insets.EMPTY)));
-	    TextField dest = new TextField("JFokus 2015!");
+	    TextField dest = new TextField("IoT DevDay 2015!");
         FlowPane flowPane = new FlowPane(box, dest);
         flowPane.setPadding(new Insets(30));
 	    Image image = DashboardHelper.getImage(bundleContext, "map").getImage();
