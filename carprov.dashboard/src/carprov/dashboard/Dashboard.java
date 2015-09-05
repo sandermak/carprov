@@ -25,7 +25,6 @@ import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import carprov.dashboard.api.App;
 import carprov.dashboard.api.DashboardHelper;
@@ -45,7 +44,7 @@ public class Dashboard {
 	@Inject
 	private volatile BundleContext bundleContext;
 	
-	private final Map<ServiceReference, App> apps = new ConcurrentHashMap<>();
+	private final Map<String, App> apps = new ConcurrentHashMap<>();
 	private final Map<String, Node> addedDashboardIcons = new ConcurrentHashMap<>();
 	private final AtomicBoolean uiReady = new AtomicBoolean(false);
 	
@@ -67,18 +66,18 @@ public class Dashboard {
 	}
 
 	@ServiceDependency(removed = "removeApp", required = false)
-	void addApp(ServiceReference sr, App app) {
+	void addApp(App app) {
 		System.out.println("added " + app.getAppName());
 		if (uiReady.get()) {
 			System.out.println("Directly scheduling render for " + app.getAppName());
 			Platform.runLater(() -> renderApp(app));
 		}
-		apps.put(sr, app);
+		apps.put(app.getAppName(), app);
 	}
 
-	void removeApp(ServiceReference sr) {
-		System.out.println("removed " + sr);
-		App removedApp = apps.remove(sr);
+	void removeApp(App app) {
+		System.out.println("removed " + app.getAppName());
+		App removedApp = apps.remove(app.getAppName());
 		Node removedDashboardApp = addedDashboardIcons.remove(removedApp.getAppName());
 		if(uiReady.get()) {
 			Platform.runLater(() -> {
